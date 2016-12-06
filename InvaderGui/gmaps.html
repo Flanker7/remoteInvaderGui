@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+       #map {
+        height:400px;
+        width: 100%;
+       }
+    </style>
+        <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
+        <script>
+        var foo
+   
+
+                   new QWebChannel(qt.webChannelTransport, function(channel) {
+                   // all published objects are available in channel.objects under
+                   // the identifier set in their attached WebChannel.id property
+                   foo = channel.objects.foo;
+                   // var cbox="tepai"
+                   // access a property
+                  // alert(foo.hello);
+
+
+                   // connect to a signal
+                  /* foo.someSignal.connect(function(message) {
+                       alert("Got signal: " + message);
+                       console.log("Got signal: " + message);
+                   });*/
+
+
+                   // invoke a method, and receive the return value asynchronously
+                    //foo.someMethod(function(ret) {
+                    //   alert("Got return value: " + ret);
+
+                      //  console.log("Got signal: " + ret);
+                   //});
+               });
+       </script>
+  </head>
+  <body>
+    <div id="map" style="height: 100%; position: absolute; right: 0;top: 0;" ></div>
+
+    <script>
+      function initMap() {
+
+        var uluru = {lat: 38.577056, lng:-9.019695};
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 18,
+          center: uluru,
+          mapTypeId: 'satellite'
+        });
+        //TEST TO TRY TO SET MARKER FROM XML-BEGIN-SUCCESS
+        // connect to a signal
+
+        foo.someSignal.connect(function(coordinates,layersJson) {
+
+
+        console.log(coordinates);
+        console.log(parseFloat(coordinates.geographic_info.ref_latitude));
+        console.log(parseFloat(coordinates.geographic_info.ref_longitude));
+          uluru={lat:parseFloat(coordinates.geographic_info.ref_latitude), lng:parseFloat(coordinates.geographic_info.ref_longitude)};
+
+                map.setCenter(uluru);
+              var marker = new google.maps.Marker({
+              position: uluru,
+              map: map
+
+            });
+            //--TRYING TO CONVERT POINT TO LATLONG---BEGIN
+            console.log(JSON.stringify(layersJson))
+            var polygon = new google.maps.Polygon({paths:layersJson,strokeColor: "#7FFF00",fillColor: '#7FFF00', editable:true, draggable:true,strokeOpacity: 1.0,strokeWeight: 1 })
+            polygon.setMap(map);
+
+            //--TRYING TO CONVERT POINT TO LATLONG---BEGIN
+
+            //primeiroponto={lat:layersJson[0], lng:layersJson[1]};
+
+            //var marker2 = new google.maps.Marker({
+            //position: primeiroponto,
+            //map: map
+
+          //});
+
+        });
+
+        //TEST TO TRY TO SET MARKER FROM XML-END
+        //commented to test user side sending info
+      //  var marker = new google.maps.Marker({
+       //   position: uluru,
+        //  map: map
+        //});
+        var outerCoords = [
+           {lat: 38.4, lng:-9.0}, // north west
+           {lat: 38.6, lng: -9.1}, // south west
+           {lat:38.6, lng: -9.0}, // south east
+           {lat: 38.4, lng: -9.1}  // north east
+         ];
+         //console.log(foo.hello);
+
+         // Define the LatLng coordinates for an inner path.
+         var innerCoords1 = [
+           {lat: 38.4, lng: -9.0},
+           {lat: 38.6, lng: -9.0},
+           {lat: 38.6, lng: -9.1},
+           {lat: 38.4, lng: -9.1}
+         ];
+
+         // Define the LatLng coordinates for another inner path.
+         var innerCoords2 = [
+           {lat: -33.364, lng: 156.207},
+           {lat: -34.364, lng: 156.207},
+           {lat: -34.364, lng: 157.207},
+           {lat: -33.364, lng: 157.207}
+         ];
+
+      //2 lines under work great to define polygon
+        //var polygon = new google.maps.Polygon({paths:outerCoords,strokeColor: "#7FFF00",fillColor: '#7FFF00', editable:true, draggable:true,strokeOpacity: 1.0,strokeWeight: 1 })
+        //polygon.setMap(map);
+        //map.data.add({geometry: new google.maps.Data.Polygon([outerCoords])})
+       // map.data.setStyle({fillColor: 'green',strokeWeight: 1});
+
+       //2 lines under work great to define polygon
+       //var polygon2 = new google.maps.Polygon({paths:innerCoords1,strokeColor: "red",fillColor: 'red', editable:true, draggable:true,strokeOpacity: 1.0,strokeWeight: 1 })
+       //polygon2.setMap(map);
+       // map.data.add({geometry: new google.maps.Data.Polygon([innerCoords1] ),strokeColor: "#7FFF00",fillColor: '#7FFF00',strokeOpacity: 1.0,strokeWeight: 1 })
+        //map.data.setStyle({fillColor: 'red',strokeWeight: 1});
+
+      }
+
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCQxCYUcPRCoZzezua8z0tKdqkk4VkS7cE&callback=initMap" >
+    </script>
+
+  </body>
+</html>

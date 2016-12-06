@@ -1,0 +1,4 @@
+
+function loadAreaLayers(coordinates) {
+
+}
