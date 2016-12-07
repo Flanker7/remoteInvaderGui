@@ -121,7 +121,7 @@ Page1Form {
 
          // signals, methods and properties are
         // accessible to JavaScript code
-        signal someSignal(var coordinates, var layersJson);
+        signal someSignal(var coordinates, var layerJson);
 
            // signal some2 (variant coordinates);
         onSomeSignal: console.log(JSON.stringify( webengineview.webChannel.registeredObjects))

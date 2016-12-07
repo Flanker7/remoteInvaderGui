@@ -45,32 +45,39 @@
 
         var uluru = {lat: 38.577056, lng:-9.019695};
         var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 18,
+          zoom: 20,
           center: uluru,
           mapTypeId: 'satellite'
         });
         //TEST TO TRY TO SET MARKER FROM XML-BEGIN-SUCCESS
         // connect to a signal
 
-        foo.someSignal.connect(function(coordinates,layersJson) {
+        foo.someSignal.connect(function(coordinates,layerJson) {
 
 
-        console.log(coordinates);
+      /*  console.log(coordinates);
         console.log(parseFloat(coordinates.geographic_info.ref_latitude));
         console.log(parseFloat(coordinates.geographic_info.ref_longitude));
-          uluru={lat:parseFloat(coordinates.geographic_info.ref_latitude), lng:parseFloat(coordinates.geographic_info.ref_longitude)};
+        */
+        //RELOCATING TO NEW IMAGE CENTER
+        uluru={lat:parseFloat(coordinates.geographic_info.ref_latitude), lng:parseFloat(coordinates.geographic_info.ref_longitude)};
 
                 map.setCenter(uluru);
+         //ADDING MARKER TO CHECK IF NEW CENTER
               var marker = new google.maps.Marker({
               position: uluru,
+              zoom: 2,
               map: map
 
             });
             //--TRYING TO CONVERT POINT TO LATLONG---BEGIN
-            console.log(JSON.stringify(layersJson))
-            var polygon = new google.maps.Polygon({paths:layersJson,strokeColor: "#7FFF00",fillColor: '#7FFF00', editable:true, draggable:true,strokeOpacity: 1.0,strokeWeight: 1 })
-            polygon.setMap(map);
-
+            //console.log(JSON.stringify(layersJson))
+            console.log(layerJson.length)
+            for(var j=0; j<layerJson.length;j++)
+            {
+                var polygon = new google.maps.Polygon({paths:layerJson[j].coord,strokeColor: layerJson[j].color/*"#7FFF00"*/,fillColor: layerJson[j].color /*'#7FFF00'*/, editable:true, draggable:true,strokeOpacity: 1.0,strokeWeight: 1 })
+                polygon.setMap(map);
+            }
             //--TRYING TO CONVERT POINT TO LATLONG---BEGIN
 
             //primeiroponto={lat:layersJson[0], lng:layersJson[1]};

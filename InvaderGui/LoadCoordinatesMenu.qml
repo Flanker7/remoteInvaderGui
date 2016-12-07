@@ -7,6 +7,8 @@ import QtQml 2.2
 
 LoadCoordinatesMenuForm {
     property var coordinates
+    property var layerJson:new Array
+    property var layerJsoncoord:new Array
     property var layersJson:new Array
   //  property alias coordinateshtml: coordinateshtml
     Component.onCompleted: {
@@ -68,21 +70,55 @@ LoadCoordinatesMenuForm {
 
   buttonCreateLayers.onClicked: {
 
-      for(var i =0; i<coordinates.class[0].rect.length; i++){
+//      for(var i =0; i<coordinates.class[0].rect.length; i++){
 
-      loadAreaLayers1(coordinates.class[0].rect[i].X,coordinates.class[0].rect[i].Y)
-      console.log(JSON.stringify(layersJson))
-      }
+//      coordinatesToLongLat(coordinates.class[0].rect[i].X,coordinates.class[0].rect[i].Y)
+//      console.log(JSON.stringify(layersJson))
+//      }
+    loadAllElementsCoordinates()
+      //console.log(JSON.stringify(coordinates.class[0]))
 
-        console.log(JSON.stringify(layersJson))
 
-    myObject.someSignal(coordinates,layersJson)
+
+    myObject.someSignal(coordinates,layerJson)
 
  }
 
+  function loadAllElementsCoordinates(){
+      for(var j=0; j<coordinates.class.length;j++)
+      {
+          layerJsoncoord=[]
+
+          var color
+          if (coordinates.class[j].name==="Vegetation" || coordinates.class[j]==="ShortHerbs" )
+              //layerJson.push({color:"green",type:coordinates.class[j].name,coord:""})
+                color="green"
+              else if (coordinates.class[j].name==="dirt" )
+                //layerJson.push({color:"white",type:coordinates.class[j].name,coord:""})
+                color="Beige"
+              else if (coordinates.class[j].name==="RoadWay" )
+                //layerJson.push({color:"grey",type:coordinates.class[j].name,coord:""})
+                color="grey"
+              else if (coordinates.class[j].name==="acacia" )
+                //layerJson.push({color:"yellow",type:coordinates.class[j].name,coord:""})
+                color="yellow"
+              //console.log(JSON.stringify(coordinates.class[j]))
+          if(coordinates.class[j].hasOwnProperty('rect')){
+
+        for(var i =0; i<coordinates.class[j].rect.length; i++)
+        {
+            //changed x and y to change axel--TEST
+            coordinatesToLongLat(coordinates.class[j].rect[i].X,coordinates.class[j].rect[i].Y,coordinates.class[j].name)
+        }
+        layerJson.push({color:color,type:coordinates.class[j].name,coord:layerJsoncoord})
+        console.log(JSON.stringify(layerJson))
+        }
+      }
+  }
 
 
-function loadAreaLayers1(newX,newY){
+
+function coordinatesToLongLat(newX,newY,type){
     var patch_size= coordinates.parameters.patch_size
     // retrieve the lat lng for the far extremities of the (visible) map
     var lat = coordinates.geographic_info.ref_latitude
@@ -98,6 +134,11 @@ function loadAreaLayers1(newX,newY){
 
     //needs center of window
      //offsets in meters
+    //--RIGHT IN  NORTH SOUTH CASE-CHANGIN TO TEST-BEGIN
+   // dn =((centerY-newY)/patch_size)*(patch_size*coordinates.geographic_info.cm_per_1px_ratio/100)
+   //long
+    //de =((newX-centerX)/patch_size)*(patch_size*coordinates.geographic_info.cm_per_1px_ratio/100)
+    //--RIGHT IN  NORTH SOUTH CASE-CHANGIN TO TEST-END
     //in case that x>center and y >center
 //    if( newX > centerX && newY > centerY ){
     //lat
@@ -133,10 +174,22 @@ function loadAreaLayers1(newX,newY){
      //OffsetPosition, decimal degrees
      var latO = +lat + +(dLat * 180/Math.PI)
      var lonO = +lon + +(dLon * 180/Math.PI)
-     console.log(dLat * 180/Math.PI+" "+dLon * 180/Math.PI);
+       var newlnglat= rotate(coordinates.geographic_info.ref_longitude,coordinates.geographic_info.ref_latitude,lonO,latO,90)
+    console.log(dLat * 180/Math.PI+" "+dLon * 180/Math.PI);
     console.log(latO+" "+lonO);
-     layersJson.push({lat:latO, lng:lonO});
-    //layersJson.push(lonO);
+     //layerJsoncoord.push({lat:latO, lng:lonO});
+    layerJsoncoord.push({lat:newlnglat[1], lng:newlnglat[0]});
+    //layerJson[layerJson.length-1].coord+={lat:latO, lng:lonO}
 
+}
+//USE FUNCTION TO CHANGE ORIENTATION MODE--- BY DEFINITION ALGORITHM USES SOUTH NORT
+//ORIENTATION USING ROTATE ALLOWS TO USE WEST -EAST OR ANY OTHER
+function rotate(cx, cy, x, y, angle) {
+    var radians = (Math.PI / 180) * angle,
+        cos = Math.cos(radians),
+        sin = Math.sin(radians),
+        nx = (cos * (+x - +cx)) + (sin * (+y - +cy)) + +cx,
+        ny = (cos * (+y - +cy)) - (sin * (+x - +cx)) + +cy;
+    return [nx, ny];
 }
 }
